@@ -1,5 +1,5 @@
 
-# f9-Paste2Project
+# Paste2Project
 
 Paste your folder structure and generate the entire project instantly from the terminal.
 
@@ -7,7 +7,7 @@ Paste your folder structure and generate the entire project instantly from the t
 
 ## Overview
 
-f9-Paste2Project is a lightweight CLI utility for Windows that converts a pasted folder tree structure into real files and directories on your system.
+Paste2Project is a lightweight CLI utility for Windows that converts a pasted folder tree structure into real files and directories on your system.
 
 Instead of manually creating folders and files one by one, you can simply paste the structure and let f9 build the project for you automatically.
 
@@ -43,7 +43,7 @@ f9/
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/forex911/f9-paste2project.git
+git clone https://github.com/forex911/paste2project.git
 cd f9
 ```
 
