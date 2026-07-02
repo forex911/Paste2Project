@@ -277,48 +277,23 @@ call :info "  Verification passed"
 exit /b 0
 
 :update_path
-for /f "tokens=2*" %%A in ('reg query "HKCU\Environment" /v PATH 2^>nul') do set "CURRENT_PATH=%%B"
-echo %CURRENT_PATH% | find /i "%INSTALL_DIR%" >nul
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$p = [Environment]::GetEnvironmentVariable('PATH', 'User'); if ($p -notmatch [regex]::Escape('%INSTALL_DIR%')) { $np = $p + ';%INSTALL_DIR%'; [Environment]::SetEnvironmentVariable('PATH', $np, 'User'); exit 0 } else { exit 1 }"
 if errorlevel 1 (
-    if defined CURRENT_PATH (
-        setx PATH "%CURRENT_PATH%;%INSTALL_DIR%" >nul
-    ) else (
-        setx PATH "%INSTALL_DIR%" >nul
-    )
-    if errorlevel 1 (
-        exit /b 1
-    )
+    call :info "  Already in PATH"
+) else (
     call :info "  Added to PATH"
     call :log "PATH updated"
-) else (
-    call :info "  Already in PATH"
 )
 exit /b 0
 
 :remove_from_path
-for /f "tokens=2*" %%A in ('reg query "HKCU\Environment" /v PATH 2^>nul') do set "CURRENT_PATH=%%B"
-if not defined CURRENT_PATH exit /b 0
-
-:: Rebuild PATH without INSTALL_DIR
-set "NEW_PATH="
-for %%P in ("%CURRENT_PATH:;=" "%") do (
-    set "SEGMENT=%%~P"
-    if /i not "!SEGMENT!"=="%INSTALL_DIR%" (
-        if defined NEW_PATH (
-            set "NEW_PATH=!NEW_PATH!;!SEGMENT!"
-        ) else (
-            set "NEW_PATH=!SEGMENT!"
-        )
-    )
-)
-if defined NEW_PATH (
-    setx PATH "!NEW_PATH!" >nul
-    call :info "  Removed from PATH"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$p = [Environment]::GetEnvironmentVariable('PATH', 'User'); if ($p -match [regex]::Escape('%INSTALL_DIR%')) { $np = ($p -split ';' | Where-Object { $_ -ne '%INSTALL_DIR%' }) -join ';'; [Environment]::SetEnvironmentVariable('PATH', $np, 'User'); exit 0 } else { exit 1 }"
+if errorlevel 1 (
+    call :info "  Not in PATH"
 ) else (
-    setx PATH "" >nul
-    call :info "  PATH cleared"
+    call :info "  Removed from PATH"
+    call :log "PATH cleaned"
 )
-call :log "PATH cleaned"
 exit /b 0
 
 
